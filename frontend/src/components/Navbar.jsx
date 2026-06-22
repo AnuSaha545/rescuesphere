@@ -13,6 +13,10 @@ function Navbar() {
             Dashboard
           </Link>
 
+          <Link className="btn btn-outline-light mx-2" to="/submit">
+            Submit
+          </Link>
+
           <Link className="btn btn-outline-light mx-2" to="/requests">
             Requests
           </Link>

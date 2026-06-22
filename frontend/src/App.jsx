@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Requests from "./pages/Requests";
 import Resources from "./pages/Resources";
+import SubmitRequest from "./pages/SubmitRequest";
 
 function App() {
   return (
@@ -20,20 +21,10 @@ function App() {
 
         <Routes>
 
-          <Route
-            path="/"
-            element={<Dashboard />}
-          />
-
-          <Route
-            path="/requests"
-            element={<Requests />}
-          />
-
-          <Route
-            path="/resources"
-            element={<Resources />}
-          />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/submit" element={<SubmitRequest />} />
+          <Route path="/requests" element={<Requests />} />
+          <Route path="/resources" element={<Resources />} />
 
         </Routes>
 
