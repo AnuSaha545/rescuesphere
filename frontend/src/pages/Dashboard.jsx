@@ -1,132 +1,191 @@
 import { useEffect, useState } from "react";
-import { getRequests } from "../services/api";
+import {
+  getDashboard,
+  getRequests
+} from "../services/api";
+
 import DashboardChart from "../components/DashboardChart";
 
 function Dashboard() {
+
   const [stats, setStats] = useState({
-    total: 0,
-    critical: 0,
-    medical: 0,
+    total_requests: 0,
+    critical_requests: 0,
+    medical_requests: 0,
+    food_requests: 0,
+    water_requests: 0,
   });
 
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
-    loadStats();
+    loadDashboard();
   }, []);
 
-  const loadStats = async () => {
+  const loadDashboard = async () => {
     try {
-      const data = await getRequests();
 
-      setRequests(data);
+      const dashboardData =
+        await getDashboard();
 
-      const critical = data.filter(
-        (r) => r.priority?.toLowerCase() === "critical"
-      ).length;
+      const requestData =
+        await getRequests();
 
-      const medical = data.filter(
-        (r) => r.category?.toLowerCase() === "medical"
-      ).length;
+      setStats(dashboardData);
 
-      setStats({
-        total: data.length,
-        critical,
-        medical,
-      });
+      setRequests(requestData);
+
     } catch (error) {
-      console.error("Error loading dashboard data:", error);
+      console.error(
+        "Error loading dashboard:",
+        error
+      );
     }
   };
 
   return (
     <div>
-      <h2 className="mb-4">Dashboard</h2>
+
+      <h2 className="mb-4">
+        RescueSphere Dashboard
+      </h2>
 
       <div className="row">
-        <div className="col-md-4">
+
+        <div className="col-md-3 mb-3">
           <div className="card text-center shadow">
             <div className="card-body">
-              <h5>Total Requests</h5>
-              <h1>{stats.total}</h1>
+              <h6>Total Requests</h6>
+              <h2>
+                {stats.total_requests}
+              </h2>
             </div>
           </div>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-3 mb-3">
           <div className="card text-center shadow">
             <div className="card-body">
-              <h5>Critical Requests</h5>
-              <h1>{stats.critical}</h1>
+              <h6>Critical Requests</h6>
+              <h2>
+                {stats.critical_requests}
+              </h2>
             </div>
           </div>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-3 mb-3">
           <div className="card text-center shadow">
             <div className="card-body">
-              <h5>Medical Requests</h5>
-              <h1>{stats.medical}</h1>
+              <h6>Medical Requests</h6>
+              <h2>
+                {stats.medical_requests}
+              </h2>
             </div>
           </div>
         </div>
+
+        <div className="col-md-3 mb-3">
+          <div className="card text-center shadow">
+            <div className="card-body">
+              <h6>Food Requests</h6>
+              <h2>
+                {stats.food_requests}
+              </h2>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <h3 className="mt-5 mb-3">System Overview</h3>
+      <div className="row">
 
-      <div className="card shadow">
-        <div className="card-body">
-          <p>
-            <strong>Total Emergency Requests:</strong> {stats.total}
-          </p>
-
-          <p>
-            <strong>Critical Cases:</strong> {stats.critical}
-          </p>
-
-          <p>
-            <strong>Medical Cases:</strong> {stats.medical}
-          </p>
+        <div className="col-md-3 mb-3">
+          <div className="card text-center shadow">
+            <div className="card-body">
+              <h6>Water Requests</h6>
+              <h2>
+                {stats.water_requests}
+              </h2>
+            </div>
+          </div>
         </div>
+
       </div>
 
-      <div className="mt-5 d-flex justify-content-center">
+      <div className="mt-4 d-flex justify-content-center">
+
         <DashboardChart
-          total={stats.total}
-          critical={stats.critical}
-          medical={stats.medical}
+          total={stats.total_requests}
+          critical={stats.critical_requests}
+          medical={stats.medical_requests}
         />
+
       </div>
 
-      <h3 className="mt-5">Recent Requests</h3>
+      <h3 className="mt-5">
+        Recent Requests
+      </h3>
 
       <div className="card shadow">
+
         <div className="card-body">
+
           {requests.length === 0 ? (
+
             <p>No requests found.</p>
+
           ) : (
-            requests.slice(0, 5).map((request) => (
-              <div key={request.id} className="mb-3">
-                <strong>{request.message}</strong>
 
-                <br />
+            requests
+              .slice(0, 5)
+              .map((request) => (
 
-                <span>
-                  <strong>Category:</strong> {request.category}
-                </span>
+                <div
+                  key={request.id}
+                  className="mb-3"
+                >
 
-                <br />
+                  <strong>
+                    {request.message}
+                  </strong>
 
-                <span>
-                  <strong>Priority:</strong> {request.priority}
-                </span>
+                  <br />
 
-                <hr />
-              </div>
-            ))
+                  <span>
+                    Category:
+                    {" "}
+                    {request.category}
+                  </span>
+
+                  <br />
+
+                  <span>
+                    Priority:
+                    {" "}
+                    {request.priority}
+                  </span>
+
+                  <br />
+
+                  <span>
+                    Status:
+                    {" "}
+                    {request.status}
+                  </span>
+
+                  <hr />
+
+                </div>
+
+              ))
+
           )}
+
         </div>
+
       </div>
+
     </div>
   );
 }

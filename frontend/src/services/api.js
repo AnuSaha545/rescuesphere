@@ -3,6 +3,7 @@ const API_BASE_URL = "http://127.0.0.1:8000";
 async function parseJson(response) {
   if (!response.ok) {
     const errorText = await response.text();
+
     throw new Error(
       errorText || "Unexpected API error"
     );
@@ -89,6 +90,38 @@ export const updateRequestStatus =
           status,
         }),
       }
+    );
+
+    return parseJson(response);
+  };
+
+export const createAssignment =
+  async (
+    requestId,
+    resourceId
+  ) => {
+    const response = await fetch(
+      `${API_BASE_URL}/assignments`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          request_id: requestId,
+          resource_id: resourceId,
+        }),
+      }
+    );
+
+    return parseJson(response);
+  };
+
+export const getAssignments =
+  async () => {
+    const response = await fetch(
+      `${API_BASE_URL}/assignments`
     );
 
     return parseJson(response);
