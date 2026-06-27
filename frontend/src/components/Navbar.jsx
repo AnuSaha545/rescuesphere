@@ -1,56 +1,53 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Navbar() {
+  const location = useLocation();
+
+  const menus = [
+    { name: "Dashboard", path: "/" },
+    { name: "Incidents", path: "/requests" },
+    { name: "Resources", path: "/resources" },
+    { name: "Map", path: "/map" }
+  ];
+
   return (
-    <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
+    <nav
+      className="navbar navbar-expand-lg"
+      style={{
+        background: "#0F172A",
+        boxShadow: "0 8px 25px rgba(0,0,0,.15)"
+      }}
+    >
+      <div className="container-fluid">
 
-      <div className="container">
-
-        <span className="navbar-brand">
-          RescueSphere
+        <span
+          className="navbar-brand fw-bold text-white"
+          style={{ fontSize: "1.4rem" }}
+        >
+          🚨 RescueSphere
         </span>
 
-        <div>
+        <div className="navbar-nav ms-auto">
 
-          <Link
-            className="btn btn-outline-light mx-2"
-            to="/"
-          >
-            Dashboard
-          </Link>
+          {menus.map((menu) => (
 
-          <Link
-            className="btn btn-outline-light mx-2"
-            to="/submit"
-          >
-            Submit
-          </Link>
+            <Link
+              key={menu.path}
+              to={menu.path}
+              className={`nav-link mx-2 ${
+                location.pathname === menu.path
+                  ? "text-warning"
+                  : "text-white"
+              }`}
+            >
+              {menu.name}
+            </Link>
 
-          <Link
-            className="btn btn-outline-light mx-2"
-            to="/requests"
-          >
-            Requests
-          </Link>
-
-          <Link
-            className="btn btn-outline-light mx-2"
-            to="/resources"
-          >
-            Resources
-          </Link>
-
-          <Link
-            className="btn btn-outline-warning mx-2"
-            to="/map"
-          >
-            Emergency Map
-          </Link>
+          ))}
 
         </div>
 
       </div>
-
     </nav>
   );
 }

@@ -10,44 +10,43 @@ import {
   createAssignment
 } from "../services/api";
 
+import IncidentCard from "../components/IncidentCard";
+import DashboardSummary from "../components/DashboardSummary";
+
 function Requests() {
 
-  const [requests, setRequests] =
-    useState([]);
-
-  const [resources, setResources] =
-    useState([]);
-
-  const [selectedResources,
-    setSelectedResources] =
-    useState({});
+  const [requests, setRequests] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [selectedResources, setSelectedResources] = useState({});
 
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
+
     try {
 
-      const requestData =
-        await getRequests();
-
-      const resourceData =
-        await getResources();
+      const requestData = await getRequests();
+      const resourceData = await getResources();
 
       setRequests(requestData);
       setResources(resourceData);
 
     } catch (error) {
+
       console.error(error);
+
     }
+
   };
 
-  const handleStatusUpdate =
-    async (
-      requestId,
-      status
-    ) => {
+  const handleStatusUpdate = async (
+    requestId,
+    status
+  ) => {
+
+    try {
 
       await updateRequestStatus(
         requestId,
@@ -55,204 +54,144 @@ function Requests() {
       );
 
       loadData();
-    };
 
-  const handleAssign =
-    async (
-      requestId
-    ) => {
+    } catch (error) {
 
-      const resourceId =
-        selectedResources[
-          requestId
-        ];
+      console.error(error);
 
-      if (!resourceId) {
-        alert(
-          "Please select a resource"
-        );
-        return;
-      }
+    }
 
-      try {
+  };
 
-        await createAssignment(
-          requestId,
-          parseInt(resourceId)
-        );
+  const handleAssign = async (
+    requestId
+  ) => {
 
-        alert(
-          "Resource assigned successfully"
-        );
+    const resourceId =
+      selectedResources[requestId];
 
-        loadData();
+    if (!resourceId) {
 
-      } catch (error) {
+      alert("Please select a resource.");
 
-        console.error(error);
+      return;
 
-        alert(
-          "Assignment failed"
-        );
-      }
-    };
+    }
+
+    try {
+
+      await createAssignment(
+        requestId,
+        parseInt(resourceId)
+      );
+
+      alert(
+        "Resource assigned successfully."
+      );
+
+      loadData();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Assignment failed.");
+
+    }
+
+  };
 
   return (
-    <div>
 
-      <h2 className="mb-4">
-        Emergency Requests
-      </h2>
+    <div className="container py-4">
 
-      {requests.map((request) => (
+      {/* Header */}
 
-        <div
-          key={request.id}
-          className="card shadow mb-3"
-        >
+      <div className="d-flex justify-content-between align-items-center mb-4">
 
-          <div className="card-body">
+        <div>
 
-            <h5>
-              {request.message}
-            </h5>
+          <h2 className="fw-bold">
 
-            <p>
-              <strong>
-                Category:
-              </strong>{" "}
-              {request.category}
-            </p>
+            🚨 RescueSphere Command Center
 
-            <p>
-              <strong>
-                Priority:
-              </strong>{" "}
-              {request.priority}
-            </p>
+          </h2>
 
-            <p>
-              <strong>
-                Recommended:
-              </strong>{" "}
-              {
-                request.recommended_resource
-              }
-            </p>
+          <p className="text-muted mb-0">
 
-            <p>
-              <strong>
-                Status:
-              </strong>{" "}
-              {request.status}
-            </p>
+            AI Powered Emergency Monitoring & Dispatch
 
-            <hr />
-
-            <label className="form-label">
-              Assign Resource
-            </label>
-
-            <select
-              className="form-select mb-2"
-              value={
-                selectedResources[
-                  request.id
-                ] || ""
-              }
-              onChange={(e) =>
-                setSelectedResources({
-                  ...selectedResources,
-                  [request.id]:
-                    e.target.value,
-                })
-              }
-            >
-
-              <option value="">
-                Select Resource
-              </option>
-
-              {resources
-                .filter(
-                  (resource) =>
-                    resource.status ===
-                    "available"
-                )
-                .map((resource) => (
-
-                  <option
-                    key={resource.id}
-                    value={resource.id}
-                  >
-
-                    {resource.name}
-
-                  </option>
-
-                ))}
-
-            </select>
-
-            <button
-              className="btn btn-primary mb-3"
-              onClick={() =>
-                handleAssign(
-                  request.id
-                )
-              }
-            >
-              Assign Resource
-            </button>
-
-            <div>
-
-              <label className="form-label">
-                Update Status
-              </label>
-
-              <select
-                className="form-select"
-                value={
-                  request.status ||
-                  "pending"
-                }
-                onChange={(e) =>
-                  handleStatusUpdate(
-                    request.id,
-                    e.target.value
-                  )
-                }
-              >
-
-                <option value="pending">
-                  Pending
-                </option>
-
-                <option value="assigned">
-                  Assigned
-                </option>
-
-                <option value="in_progress">
-                  In Progress
-                </option>
-
-                <option value="resolved">
-                  Resolved
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
+          </p>
 
         </div>
 
-      ))}
+        <span className="badge bg-dark fs-6 p-3">
+
+          {requests.length} Active Incident(s)
+
+        </span>
+
+      </div>
+
+      {/* Dashboard Summary */}
+
+      <DashboardSummary
+        requests={requests}
+        resources={resources}
+      />
+
+      {/* Incident Cards */}
+
+      <div className="mt-4">
+
+        {requests.length === 0 ? (
+
+          <div className="alert alert-info">
+
+            No emergency incidents found.
+
+          </div>
+
+        ) : (
+
+          requests.map((request) => (
+
+            <IncidentCard
+
+              key={request.id}
+
+              request={request}
+
+              resources={resources}
+
+              selectedResources={
+                selectedResources
+              }
+
+              setSelectedResources={
+                setSelectedResources
+              }
+
+              handleAssign={
+                handleAssign
+              }
+
+              handleStatusUpdate={
+                handleStatusUpdate
+              }
+
+            />
+
+          ))
+
+        )}
+
+      </div>
 
     </div>
+
   );
+
 }
 
 export default Requests;
