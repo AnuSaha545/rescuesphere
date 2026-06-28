@@ -11,9 +11,12 @@ import Requests from "./pages/Requests";
 import Resources from "./pages/Resources";
 import SubmitRequest from "./pages/SubmitRequest";
 import MapView from "./pages/MapView";
+import History from "./pages/History";
 
 function App() {
+
   return (
+
     <BrowserRouter>
 
       <Navbar />
@@ -47,12 +50,19 @@ function App() {
             element={<MapView />}
           />
 
+          <Route
+            path="/history"
+            element={<History />}
+          />
+
         </Routes>
 
       </div>
 
     </BrowserRouter>
+
   );
+
 }
 
 export default App;

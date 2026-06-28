@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState
-} from "react";
+import { useEffect, useState } from "react";
 
 import {
   getRequests,
@@ -10,30 +7,44 @@ import {
   createAssignment
 } from "../services/api";
 
-import IncidentCard from "../components/IncidentCard";
 import DashboardSummary from "../components/DashboardSummary";
+import IncidentTable from "../components/IncidentTable";
+import IncidentModal from "../components/IncidentModal";
+import NewIncidentModal from "../components/NewIncidentModal";
 
 function Requests() {
 
   const [requests, setRequests] = useState([]);
   const [resources, setResources] = useState([]);
   const [selectedResources, setSelectedResources] = useState({});
+  const [selectedIncident, setSelectedIncident] = useState(null);
+
+  const [showNewIncident, setShowNewIncident] =
+    useState(false);
 
   useEffect(() => {
+
     loadData();
+
   }, []);
 
   const loadData = async () => {
 
     try {
 
-      const requestData = await getRequests();
-      const resourceData = await getResources();
+      const requestData =
+        await getRequests();
+
+      const resourceData =
+        await getResources();
 
       setRequests(requestData);
+
       setResources(resourceData);
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
       console.error(error);
 
@@ -55,7 +66,9 @@ function Requests() {
 
       loadData();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
       console.error(error);
 
@@ -68,11 +81,15 @@ function Requests() {
   ) => {
 
     const resourceId =
-      selectedResources[requestId];
+      selectedResources[
+        requestId
+      ];
 
     if (!resourceId) {
 
-      alert("Please select a resource.");
+      alert(
+        "Please select a resource."
+      );
 
       return;
 
@@ -85,17 +102,17 @@ function Requests() {
         parseInt(resourceId)
       );
 
-      alert(
-        "Resource assigned successfully."
-      );
-
       loadData();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
       console.error(error);
 
-      alert("Assignment failed.");
+      alert(
+        "Assignment failed."
+      );
 
     }
 
@@ -117,76 +134,106 @@ function Requests() {
 
           </h2>
 
-          <p className="text-muted mb-0">
+          <p className="text-muted">
 
-            AI Powered Emergency Monitoring & Dispatch
+            Live Incident Monitoring
 
           </p>
 
         </div>
 
-        <span className="badge bg-dark fs-6 p-3">
+        <div className="d-flex gap-2">
 
-          {requests.length} Active Incident(s)
+          <span className="badge bg-dark fs-6">
 
-        </span>
+            {requests.length} Incident(s)
+
+          </span>
+
+          <button
+            className="btn btn-danger"
+            onClick={() =>
+              setShowNewIncident(true)
+            }
+          >
+
+            + New Incident
+
+          </button>
+
+        </div>
 
       </div>
 
-      {/* Dashboard Summary */}
+      {/* Dashboard */}
 
       <DashboardSummary
+
         requests={requests}
+
         resources={resources}
+
       />
 
-      {/* Incident Cards */}
+      {/* Incident Table */}
 
-      <div className="mt-4">
+      <IncidentTable
 
-        {requests.length === 0 ? (
+        requests={requests}
 
-          <div className="alert alert-info">
+        resources={resources}
 
-            No emergency incidents found.
+        selectedResources={
+          selectedResources
+        }
 
-          </div>
+        setSelectedResources={
+          setSelectedResources
+        }
 
-        ) : (
+        handleAssign={
+          handleAssign
+        }
 
-          requests.map((request) => (
+        handleStatusUpdate={
+          handleStatusUpdate
+        }
 
-            <IncidentCard
+        onView={
+          setSelectedIncident
+        }
 
-              key={request.id}
+      />
 
-              request={request}
+      {/* View Incident Modal */}
 
-              resources={resources}
+      <IncidentModal
 
-              selectedResources={
-                selectedResources
-              }
+        request={selectedIncident}
 
-              setSelectedResources={
-                setSelectedResources
-              }
+        onClose={() =>
+          setSelectedIncident(null)
+        }
 
-              handleAssign={
-                handleAssign
-              }
+      />
 
-              handleStatusUpdate={
-                handleStatusUpdate
-              }
+      {/* Create Incident Modal */}
 
-            />
+      <NewIncidentModal
 
-          ))
+        show={showNewIncident}
 
-        )}
+        onClose={() =>
+          setShowNewIncident(false)
+        }
 
-      </div>
+        onSuccess={() => {
+
+          loadData();
+
+        }}
+
+      />
 
     </div>
 
