@@ -32,6 +32,7 @@ function UserLocation() {
   useEffect(() => {
 
     if (
+      typeof navigator === "undefined" ||
       !navigator.geolocation
     ) {
 

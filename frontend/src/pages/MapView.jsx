@@ -4,8 +4,7 @@ import {
   MapContainer,
   TileLayer,
   Marker,
-  Popup,
-  Polyline
+  Popup
 } from "react-leaflet";
 
 import L from "leaflet";
@@ -120,7 +119,7 @@ function MapView() {
 
       loadData();
 
-    }, 5000);
+    }, 10000);
 
     return () => clearInterval(interval);
 
@@ -128,16 +127,12 @@ function MapView() {
 
   const center = useMemo(() => {
 
-    if (requests.length > 0) {
+    const validRequest = requests.find(
+      (request) => request.latitude != null && request.longitude != null
+    );
 
-      return [
-
-        requests[0].latitude,
-
-        requests[0].longitude
-
-      ];
-
+    if (validRequest) {
+      return [validRequest.latitude, validRequest.longitude];
     }
 
     return [19.0760, 72.8777];
@@ -208,127 +203,77 @@ function MapView() {
     resources={resources}
   />
 
-  {requests.map((request) => (
+  {requests
+    .filter((request) => request.latitude != null && request.longitude != null)
+    .map((request) => (
+      <Marker
+        key={request.id}
+        position={[request.latitude, request.longitude]}
+        icon={incidentIcons[request.priority] || incidentIcons.low}
+      >
+        <Popup>
+          <h5>🚨 Incident #{request.id}</h5>
+          <hr />
+          <p>
+            <strong>Message</strong>
+            <br />
+            {request.message}
+          </p>
+          <p>
+            <strong>Category</strong>
+            <br />
+            {request.category}
+          </p>
+          <p>
+            <strong>Priority</strong>
+            <br />
+            {request.priority}
+          </p>
+          <p>
+            <strong>Status</strong>
+            <br />
+            {request.status}
+          </p>
+          <p>
+            <strong>Recommended Team</strong>
+            <br />
+            {request.recommended_resource}
+          </p>
+        </Popup>
+      </Marker>
+    ))}
 
-    <Marker
-      key={request.id}
-      position={[
-        request.latitude,
-        request.longitude
-      ]}
-      icon={
-        incidentIcons[
-          request.priority
-        ] || incidentIcons.low
-      }
-    >
-
-      <Popup>
-        <h5>🚨 Incident #{request.id}</h5>
-        <hr />
-        <p>
-          <strong>Message</strong><br />
-          {request.message}
-        </p>
-        <p>
-          <strong>Category</strong><br />
-          {request.category}
-        </p>
-        <p>
-          <strong>Priority</strong><br />
-          {request.priority}
-        </p>
-        <p>
-          <strong>Status</strong><br />
-          {request.status}
-        </p>
-        <p>
-          <strong>Recommended Team</strong><br />
-          {request.recommended_resource}
-        </p>
-      </Popup>
-
-    </Marker>
-
-  ))}
-
-  {resources
+  {/* {resources
     .filter(
-      (resource) =>
-        resource.latitude &&
-        resource.longitude
+      (resource) => resource.latitude != null && resource.longitude != null
     )
     .map((resource) => (
-
       <Marker
         key={`resource-${resource.id}`}
-        position={[
-          resource.latitude,
-          resource.longitude
-        ]}
-        icon={
-          resourceIcons[
-            resource.resource_type
-          ] || resourceIcons.default
-        }
+        position={[resource.latitude, resource.longitude]}
+        icon={resourceIcons[resource.resource_type] || resourceIcons.default}
       >
-
         <Popup>
           <h5>{resource.name}</h5>
           <hr />
           <p>
-            <strong>Resource Type</strong><br />
+            <strong>Resource Type</strong>
+            <br />
             {resource.resource_type}
           </p>
           <p>
-            <strong>Status</strong><br />
+            <strong>Status</strong>
+            <br />
             {resource.status}
           </p>
           <p>
-            <strong>Resource ID</strong><br />
+            <strong>Resource ID</strong>
+            <br />
             #{resource.id}
           </p>
         </Popup>
-
       </Marker>
-
-    ))}
-
-  {/* ROUTES */}
-
-  {assignments.map((assignment) => {
-
-    if (
-      assignment.resource_latitude == null ||
-      assignment.resource_longitude == null ||
-      assignment.request_latitude == null ||
-      assignment.request_longitude == null
-    ) {
-      return null;
-    }
-
-    return (
-      <Polyline
-        key={`route-${assignment.id}`}
-        positions={[
-          [
-            assignment.resource_latitude,
-            assignment.resource_longitude
-          ],
-          [
-            assignment.request_latitude,
-            assignment.request_longitude
-          ]
-        ]}
-        pathOptions={{
-          color: "#2563EB",
-          weight: 4,
-          opacity: 0.8
-        }}
-      />
-    );
-
-  })}
+    ))} */}
 
 </MapContainer>
 

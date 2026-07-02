@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useMap } from "react-leaflet";
 
@@ -11,15 +11,21 @@ function FitMapBounds({
 
   const map = useMap();
 
+  const hasFitted = useRef(false);
+
   useEffect(() => {
+
+    if (hasFitted.current) {
+      return;
+    }
 
     const bounds = [];
 
     requests.forEach((request) => {
 
       if (
-        request.latitude &&
-        request.longitude
+        request.latitude != null &&
+        request.longitude != null
       ) {
 
         bounds.push([
@@ -34,8 +40,8 @@ function FitMapBounds({
     resources.forEach((resource) => {
 
       if (
-        resource.latitude &&
-        resource.longitude
+        resource.latitude != null &&
+        resource.longitude != null
       ) {
 
         bounds.push([
@@ -47,17 +53,16 @@ function FitMapBounds({
 
     });
 
-    if (bounds.length > 0) {
+    if (bounds.length > 0 && map && typeof map.fitBounds === "function") {
 
       map.fitBounds(
-
         L.latLngBounds(bounds),
-
         {
           padding: [60, 60]
         }
-
       );
+
+      hasFitted.current = true;
 
     }
 
